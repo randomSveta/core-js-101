@@ -19,8 +19,8 @@
  *    'Tue, 26 Jan 2016 13:48:02 GMT' => Date()
  *    'Sun, 17 May 1998 03:00:00 GMT+01' => Date()
  */
-function parseDataFromRfc2822(/* value */) {
-  throw new Error('Not implemented');
+function parseDataFromRfc2822(value) {
+  return Date.parse(value);
 }
 
 /**
@@ -34,8 +34,8 @@ function parseDataFromRfc2822(/* value */) {
  *    '2016-01-19T16:07:37+00:00'    => Date()
  *    '2016-01-19T08:07:37Z' => Date()
  */
-function parseDataFromIso8601(/* value */) {
-  throw new Error('Not implemented');
+function parseDataFromIso8601(value) {
+  return Date.parse(value);
 }
 
 
@@ -53,8 +53,9 @@ function parseDataFromIso8601(/* value */) {
  *    Date(2012,1,1)    => true
  *    Date(2015,1,1)    => false
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+function isLeapYear(date) {
+  const february29 = new Date(date.getFullYear(), 1, 29).getDate();
+  return february29 === 29;
 }
 
 
@@ -73,8 +74,21 @@ function isLeapYear(/* date */) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,10,0,0,250)     => "00:00:00.250"
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
-function timeSpanToString(/* startDate, endDate */) {
-  throw new Error('Not implemented');
+function timeSpanToString(startDate, endDate) {
+  const msec = endDate.getTime() - startDate.getTime();
+  let hours = Math.floor(msec / 3600000);
+  let min = Math.floor((msec % 3600000) / 60000);
+  let sec = Math.floor(((msec % 3600000) % 60000) / 1000);
+  let ms = ((msec % 3600000) % 60000) % 1000;
+  if (hours < 10) hours = `0${hours}`;
+  if (min < 10) min = `0${min}`;
+  if (sec < 10) sec = `0${sec}`;
+  if (ms < 100) {
+    if (ms < 10) ms = `00${ms}`;
+    else ms = `0${ms}`;
+  }
+
+  return `${hours}:${min}:${sec}.${ms}`;
 }
 
 
@@ -94,8 +108,21 @@ function timeSpanToString(/* startDate, endDate */) {
  *    Date.UTC(2016,3,5,18, 0) => Math.PI
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
-function angleBetweenClockHands(/* date */) {
-  throw new Error('Not implemented');
+function angleBetweenClockHands(date) {
+  const dateObj = new Date(date);
+  const min = dateObj.getUTCMinutes();
+  let hours = dateObj.getUTCHours();
+
+  if (hours > 12) hours -= 12;
+
+  const hoursA = 0.5 * (60 * hours + min);
+  const minA = 6 * min;
+  let angleDeg = hoursA - minA;
+
+  if (angleDeg > 180) angleDeg = 360 - angleDeg;
+
+  const angleRad = Math.abs((angleDeg * Math.PI) / 180);
+  return angleRad;
 }
 
 
